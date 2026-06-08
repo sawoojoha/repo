@@ -22,13 +22,13 @@ export const seatsState = atom({
 
 export const rowState = atom({
   key: "rowState",
-  default: 5,
+  default: 9,
   effects_UNSTABLE: [persistAtom],
 });
 
 export const columnState = atom({
   key: "columnState",
-  default: 5,
+  default: 9,
   effects_UNSTABLE: [persistAtom],
 });
 
