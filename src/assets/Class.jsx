@@ -252,7 +252,7 @@ return (
         <input
           type="number"
           min={0}
-          max={80}
+          max={35}
           value={addCount}
         onChange={(e) => {
   const inputValue =
