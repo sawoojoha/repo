@@ -275,8 +275,8 @@ return (
     value = 0;
   }
 
-  if (value > 80) {
-    value = 80;
+  if (value > 35) {
+    value = 35;
   }
 
   setAddCount(value);
