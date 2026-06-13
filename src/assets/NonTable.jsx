@@ -3,7 +3,7 @@ import React, {
   useEffect,
   useRef,
 } from "react";
-
+import Lang from "../Lang";
 import {
   useRecoilState,
   useRecoilValue,
@@ -18,6 +18,9 @@ import {
   displayModeState,
 } from "./seatsState";
 
+
+import { motion } from "framer-motion";
+
 const NonTable = ({lockMode,  
   swapMode,
   setSwapMode,
@@ -25,6 +28,14 @@ const NonTable = ({lockMode,
   setSelectedSeat,}) => {
   // ✅ 칸 크기
   const GRID_SIZE = 80;
+
+  const lang =
+  navigator.language.startsWith("ko")
+    ? "ko"
+    : "en";
+
+const t = Lang[lang];
+
 
   // ✅ 격자 크기
   const COLS = 18;
@@ -295,8 +306,7 @@ useEffect(() => {
 
         link.href = image;
 
-        link.download =
-          "자리배치.png";
+   link.download = t.captureFileName;
 
         link.click();
 
@@ -386,7 +396,7 @@ useEffect(() => {
             "0 4px 10px rgba(0,0,0,0.2)",
         }}
       >
-        캡쳐(미완)
+      {t.capture}
       </button>
 
       {/* 전체 영역 */}
@@ -473,7 +483,7 @@ useEffect(() => {
 
                       height:
                         GRID_SIZE,
-
+zIndex: 99,
                       border:
                         "1px solid #ddd",
 
@@ -509,7 +519,7 @@ useEffect(() => {
 
 
 if (selectedSeat?.id === seat.id) {
-  bg = "#60a5fa"; // 선택 강조색
+  bg = "#f3f29d"; // 선택 강조색
 }
               if (
                 overlap === 2
@@ -525,90 +535,104 @@ if (selectedSeat?.id === seat.id) {
               }
 
               return (
-                 <div
-    key={seat.id}
-    onMouseDown={(e) =>
-      handleMouseDown(e, seat.id)
-    }
+<motion.div
+  key={seat.id}
+  onMouseDown={(e) => handleMouseDown(e, seat.id)}
   onClick={() => {
-  if (lockMode) {
-    setLayoutSeats(prev =>
-      prev.map(s =>
-        s.id === seat.id
-          ? { ...s, locked: !s.locked }
-          : s
-      )
-    );
-    return;
-  }
-
-  if (swapMode) {
-    if (!selectedSeat) {
-      setSelectedSeat(seat);
+    if (lockMode) {
+      setLayoutSeats(prev =>
+        prev.map(s =>
+          s.id === seat.id
+            ? { ...s, locked: !s.locked }
+            : s
+        )
+      );
       return;
     }
 
-    if (selectedSeat.id === seat.id) {
+    if (swapMode) {
+      if (!selectedSeat) {
+        setSelectedSeat(seat);
+        return;
+      }
+
+      if (selectedSeat.id === seat.id) {
+        setSelectedSeat(null);
+        return;
+      }
+
+      setLayoutSeats(prev => {
+        const a = prev.find(s => s.id === selectedSeat.id);
+        const b = prev.find(s => s.id === seat.id);
+
+        return prev.map(s => {
+          if (s.id === a.id) return { ...a, x: b.x, y: b.y };
+          if (s.id === b.id) return { ...b, x: a.x, y: a.y };
+          return s;
+        });
+      });
+
       setSelectedSeat(null);
       return;
     }
+  }}
+  animate={{
+    x: seat.x,
+    y: seat.y,
+  }}
+transition={
+  draggingId === seat.id
+    ? { duration: 0 }
+    : { type: "spring", stiffness: 600, damping: 40 }
+}
+  style={{
+    position: "absolute",
 
-    setLayoutSeats(prev => {
-      const a = prev.find(s => s.id === selectedSeat.id);
-      const b = prev.find(s => s.id === seat.id);
+    left: 0,
+    top: 0,
 
-      return prev.map(s => {
-        if (s.id === a.id) return { ...a, x: b.x, y: b.y };
-        if (s.id === b.id) return { ...b, x: a.x, y: a.y };
-        return s;
-      });
-    });
+width: GRID_SIZE,
+height: GRID_SIZE ,
 
-    setSelectedSeat(null);
-    return;
-  }
-}}
-style={{
-  position: "absolute",
+transform: `translate(${seat.x}px, ${seat.y}px)`,
 
-  left: seat.x + 1,
-  top: seat.y + 1,
+boxSizing: "border-box",
+    background: bg,
 
-  width: GRID_SIZE - 2,
-  height: GRID_SIZE - 2,
+border: "1px solid #ddd",
+    cursor:
+      draggingId === seat.id
+        ? "grabbing"
+        : "grab",
 
-  background: bg,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
 
-  cursor:
-    draggingId === seat.id
-      ? "grabbing"
-      : "grab",
+    fontSize: 13,
+    fontWeight: "bold",
 
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
+    boxSizing: "border-box",
 
-  fontSize: 13,
-  fontWeight: "bold",
+    border:
+      draggingId === seat.id
+        ? "1px solid black"
+        : "none",
 
-  boxSizing: "border-box",
+    zIndex:
+      draggingId === seat.id
+        ? 100
+        : 1,
 
-  border:
-    draggingId === seat.id
-      ? "1px solid black"
-      : "none",
-
-  zIndex:
-    draggingId === seat.id
-      ? 100
-      : 1,
-}}
-                >
-              {!seat.deleted &&
-  (displayMode === "name"
-    ? seat.value
-    : seat.number)}
-                </div>
+    userSelect: "none",
+    pointerEvents: "auto",
+  }}
+>
+  {!seat.deleted &&
+    (displayMode === "name"
+      ? seat.value
+      : seat.number)}
+</motion.div>
               );
             }
           )}

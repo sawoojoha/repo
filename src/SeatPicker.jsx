@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useRecoilState } from "recoil";
 import html2canvas from "html2canvas";
 import { useRef } from "react";
+import Lang from "./Lang";
 import {
   lostNumbersState,
   seatsState,
@@ -19,7 +20,15 @@ export default function SeatPicker() {
     useRecoilState(lostNumbersState);
 
 
-      
+      const lang =
+  navigator.language.startsWith("ko")
+    ? "ko"
+    : "en";
+
+const t = Lang[lang];
+
+
+
 const [swapMode, setSwapMode] = useState(false);
 const [selectedSeat, setSelectedSeat] = useState(null);
 
@@ -178,7 +187,7 @@ useEffect(() => {
 const assignSeats = () => {
 
   if (!currentClass) {
-    alert("클래스를 선택하세요.");
+    alert(t.selectClass);
     return;
   }
 
@@ -232,7 +241,7 @@ console.log("seats", seats);
 
         value:
           student?.name ??
-          "(빈자리)",
+          "",
 
         number:
           student?.id ?? "",
@@ -377,14 +386,10 @@ const resetSeats = () => {
 };
 
 
-  // ---------------------------
-  // 자리 저장
-  // ---------------------------
+
   const saveSeatLayout = () => {
     if (!currentClass) {
-      alert(
-        "클래스를 먼저 선택하세요."
-      );
+   alert(t.selectClassFirst);
       return;
     }
 
@@ -410,7 +415,9 @@ localStorage.setItem(
   JSON.stringify(updatedClasses)
 );
 
-// ✅ 최신 클래스 다시 찾기
+
+
+
 const updatedClass =
   updatedClasses.find(
     (item) =>
@@ -432,7 +439,7 @@ setCurrentClass(updatedClass);
       row,
     });
 
-    alert("자리 저장 완료!");
+    alert(t.saveComplete);
   };
   const toggleLock = (id) => {
   setLayoutSeats((prev) =>
@@ -460,10 +467,10 @@ setCurrentClass(updatedClass);
 
     const link = document.createElement("a");
     link.href = image;
-    link.download = "자리배치.png";
+    link.download = t.captureFileName;
     link.click();
   } catch (error) {
-    console.error("캡쳐 실패:", error);
+  alert(t.captureFailed);
   }
 };
 
@@ -506,24 +513,61 @@ setCurrentClass(updatedClass);
         marginBottom: 20,
 
         flexWrap: "wrap",
+         background: "#7cb342",
+          color: "white",
+          border: "none",
+          padding: "10px 16px",
+          borderRadius: 12,
+          fontSize: 14,
+          fontWeight: "bold",
+          cursor: "pointer",
+          boxShadow:
+            "0 2px 6px rgba(0,0,0,0.12)",
       }}
     >
+
+
+
+
      <button
+
+            style={{
+       background: "#e2e8f0",
+color: "#334155",
+          border: "none",
+          padding: "10px 16px",
+          borderRadius: 12,
+          fontSize: 14,
+          fontWeight: "bold",
+          cursor: "pointer",
+          boxShadow:
+            "0 2px 6px rgba(0,0,0,0.12)",
+            marginRight:"70px"
+        }}
   onClick={() =>
     setShowModal(true)
   }
 >
-  asd
+{t.settings}
 </button>
-      <h1
-        style={{
-          margin: 0,
-          marginRight: 10,
-          color: "#111827",
-        }}
-      >
-        자리 정하기
-      </h1>
+
+
+
+
+<h1
+  style={{
+    margin: 0,
+    marginRight: 10,
+   color: "#e7ff91",
+    fontSize: 36,
+    fontWeight: 900,
+    letterSpacing: "-1.2px",
+    textShadow:
+      "0 2px 8px rgba(59,130,246,0.12)",
+  }}
+>
+  {t.title}
+</h1>
 
       <button
         onClick={assignSeats}
@@ -540,7 +584,7 @@ setCurrentClass(updatedClass);
             "0 2px 6px rgba(0,0,0,0.12)",
         }}
       >
-        자리 정하기
+     {t.assignSeat}
       </button>
 
       <button
@@ -558,7 +602,7 @@ setCurrentClass(updatedClass);
             "0 2px 6px rgba(0,0,0,0.12)",
         }}
       >
-        저장하기
+     {t.save}
       </button>
 
       <button
@@ -576,7 +620,7 @@ setCurrentClass(updatedClass);
             "0 2px 6px rgba(0,0,0,0.12)",
         }}
       >
-        초기화
+  {t.reset}
       </button>
 
       {/* row 입력 */}
@@ -589,6 +633,14 @@ setCurrentClass(updatedClass);
           background: "#f3f4f6",
           padding: "10px 14px",
           borderRadius: 12,
+              display: "flex",
+    alignItems: "center",
+    gap: 10,
+    marginLeft: 20,
+    background: "#f3f4f6",
+    padding: "10px 14px",
+    borderRadius: 12,
+    color: "#111827",
         }}
       >
         <span
@@ -596,7 +648,7 @@ setCurrentClass(updatedClass);
             fontWeight: "bold",
           }}
         >
-          기본 한 줄 좌석 수:
+         {t.rowCount}
         </span>
 <input
   type="number"
@@ -624,9 +676,7 @@ onChange={(e) => {
   const maxRows = 5;
 
   if (neededRows > maxRows) {
-    alert(
-      "현재 학생 수로는 배치할 수 없습니다."
-    );
+alert(t.layoutImpossible);
     return;
   }
 
@@ -674,7 +724,7 @@ onChange={(e) => {
               fontWeight: "bold",
             }}
           >
-            표시 :
+       {t.display}
           </span>
 
           <button
@@ -701,7 +751,7 @@ onChange={(e) => {
               cursor: "pointer",
             }}
           >
-            번호
+         {t.number}
           </button>
 
           <button
@@ -730,7 +780,7 @@ onChange={(e) => {
               cursor: "pointer",
             }}
           >
-            이름
+       {t.name}
           </button>
         </div>
       </div>
@@ -744,23 +794,28 @@ onClick={() => {
 }}
   style={{
     width: 130,
-
+   marginLeft:"40px",
     padding: "8px 12px",
     borderRadius: 10,
     border: "none",
-
+    color:"white",
     background: lockMode
-      ? "#3b82f6"
-      : "#d1d5db",
-
+      ? "#1b62be"
+      : "white",
+  boxShadow:
+            "0 2px 6px rgba(0,0,0,0.12)",
     fontWeight: "bold",
-
+color: lockMode
+  ? "#ffffff"
+  : "#111827",
     cursor: "pointer",
   }}
 >
-  {lockMode
-    ? "잠금 모드 종료"
-    : "잠금 모드 시작"}
+{
+  lockMode
+    ? t.lockEnd
+    : t.lockStart
+}
 </button>
    <button
  onClick={() => {
@@ -775,13 +830,20 @@ onClick={() => {
     padding: "8px 12px",
     borderRadius: 10,
     border: "none",
-    background: swapMode ? "#f59e0b" : "#d1d5db",
+    background: swapMode ? "#322fc9" : "white",
+    color: swapMode ? "white" : "black",
     fontWeight: "bold",
     cursor: "pointer",
     marginLeft: 10,
+      boxShadow:
+            "0 2px 6px rgba(0,0,0,0.12)",
   }}
 >
-  {swapMode ? "교환 모드 종료" : "자리 교환 모드"}
+{
+  swapMode
+    ? t.swapEnd
+    : t.swapStart
+}
 </button>
     </div>
     {/* 자리 배치 */}
@@ -811,7 +873,7 @@ onClick={() => {
 
     if (saved.length >= 7) {
       e.preventDefault();
-      alert("클래스는 최대 7개까지만 만들 수 있습니다.");
+      alert(t.classLimit);
       return;
     }
 
@@ -840,7 +902,7 @@ onClick={() => {
             "0 2px 6px rgba(0,0,0,0.12)",
         }}
       >
-        + 클래스 추가하기
+        {t.addClass}
       </div>
     </Link>
 
@@ -853,7 +915,7 @@ onClick={() => {
           color: "#111827",
         }}
       >
-        클래스 목록
+    {t.classList}
       </h3>
 
       {classHistory.map((item) => {
@@ -916,8 +978,7 @@ onClick={() => {
 
                 border: "none",
 
-                background:
-                  "#ef4444",
+            background: "#64748b",
 
                 color: "white",
 
@@ -983,7 +1044,7 @@ onClick={() => {
                 marginBottom: 4,
               }}
             >
-              학생 수 :
+           {t.studentCount}
               {" "}
               {
                 item.students
@@ -1020,12 +1081,29 @@ onClick={() => {
         boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
       }}
     >
-      <h2 style={{ marginTop: 0 }}>모달</h2>
+      <h2 style={{ marginTop: 0 }}>{t.modalTitle}</h2>
 
-      <p style={{ color: "#555" }}>
-        여기 원하는 내용 넣으면 됨
-      </p>
+<p style={{ color: "#555", marginBottom: 16 }}>
+  개발자 이메일:
+  <span
+    onClick={() => {
+      navigator.clipboard.writeText(
+        "pastajoha@gmail.com"
+      );
+      alert("이메일이 복사되었습니다.");
+    }}
+    style={{
+      cursor: "pointer",
+      color: "#2563eb",
+      marginLeft: 6,
+      textDecoration: "underline",
+    }}
+  >
+    pastajoha@gmail.com
+  </span>
+</p>
 
+<p>개선할 사항이 있으면 알려주세요.</p>
       <button
         onClick={() => setShowModal(false)}
         style={{
@@ -1038,7 +1116,7 @@ onClick={() => {
           cursor: "pointer",
         }}
       >
-        닫기
+      {t.close}
       </button>
     </div>
   </div>

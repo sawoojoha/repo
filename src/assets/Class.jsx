@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import { useNavigate } from "react-router-dom";
-
+import Lang from "../Lang";
 import {
   studentsState,
   currentClassState,
@@ -15,6 +15,30 @@ const [addCount, setAddCount] = useState("");
 const [currentClass, setCurrentClass] =
   useRecoilState(currentClassState);
   // ✅ 학생 수
+
+
+const lang =
+  navigator.language.startsWith("ko")
+    ? "ko"
+    : "en";
+
+const t = Lang[lang];
+
+useEffect(() => {
+  if (currentClass?.students) {
+    setAddCount(
+      currentClass.students.length
+    );
+
+    setStudents(
+      currentClass.students
+    );
+  }
+}, [currentClass]);
+
+
+
+
 
 
   // ✅ 이름 변경
@@ -49,7 +73,7 @@ const removeStudent = (id) => {
   // ✅ 저장
  const saveStudents = () => {
   if (students.length === 0) {
-    alert("학생이 없습니다.");
+alert(t.noStudents);
     return;
   }
 
@@ -102,7 +126,7 @@ if (currentClass) {
   else {
     const newClass = {
       id: Date.now(),
-      name: `클래스 ${saved.length + 1}`,
+      name: `${t.className} ${saved.length + 1}`,
       students,
     };
 
@@ -131,6 +155,7 @@ localStorage.setItem(
 
 
 // 수정 모드인 경우
+// 수정 모드인 경우
 if (currentClass) {
   const updatedClass =
     updated.find(
@@ -146,10 +171,11 @@ else {
   setCurrentClass(
     updated[updated.length - 1]
   );
-}
 
-setStudents([]);
-setAddCount(0);
+  // 새 클래스 만들기 후에만 초기화
+  setStudents([]);
+  setAddCount("");
+}
 
 navigate("/");
 };
@@ -205,7 +231,7 @@ return (
       transition: "0.2s",
     }}
   >
-    back
+   {t.back}
   </button>
 
   <h2
@@ -216,7 +242,7 @@ return (
       color: "#0f172a",
     }}
   >
-    클래스 만들기
+   {t.createClass}
   </h2>
 </div>
 
@@ -246,7 +272,7 @@ return (
             fontSize: 16,
           }}
         >
-          학생 수
+       {t.studentCount}
         </span>
 
         <input
@@ -323,7 +349,7 @@ const updatedStudents =
             background:
               students.length === 0
                 ? "#94a3b8"
-                : "#22c55e",
+                :  "#0ea5e9",
 
             color: "white",
 
@@ -345,7 +371,7 @@ const updatedStudents =
               "0 4px 14px rgba(34,197,94,0.25)",
           }}
         >
-          저장하기
+         {t.save}
         </button>
       </div>
     </div>
@@ -434,7 +460,7 @@ opacity:
            <input
   disabled={student.deleted}
               type="text"
-              placeholder="이름 입력"
+            placeholder={t.enterName}
               value={student.name}
               onChange={(e) =>
                 changeName(
@@ -442,6 +468,7 @@ opacity:
                   e.target.value
                 )
               }
+                maxLength={9}
               style={{
                 flex: 1,
 
@@ -474,8 +501,8 @@ opacity:
 
     background:
       student.deleted
-        ? "#22c55e"
-        : "#ef4444",
+        ? "#0ea5e9"
+        :   "#64748b",
 
     color: "white",
 
@@ -492,9 +519,9 @@ opacity:
     flexShrink: 0,
   }}
 >
-  {student.deleted
-    ? "복구"
-    : "삭제"}
+{student.deleted
+  ? t.restore
+  : t.delete}
 </button>
           </div>
         )
