@@ -54,7 +54,7 @@ const Lang = {
   },
 
   en: {
-    title: "Seat Assignment",
+    title: "",
     assignSeat: "Assign Seats",
     save: "Save",
     reset: "Reset",

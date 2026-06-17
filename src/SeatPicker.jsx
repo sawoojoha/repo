@@ -1084,13 +1084,15 @@ color: lockMode
       <h2 style={{ marginTop: 0 }}>{t.modalTitle}</h2>
 
 <p style={{ color: "#555", marginBottom: 16 }}>
-  개발자 이메일:
+  {lang === "ko" ? "개발자 이메일:" : "Contact Email:"}
   <span
     onClick={() => {
       navigator.clipboard.writeText(
         "pastajoha@gmail.com"
       );
-      alert("이메일이 복사되었습니다.");
+alert(lang === "ko"
+  ? "이메일이 복사되었습니다."
+  : "The email address has been copied.");
     }}
     style={{
       cursor: "pointer",
@@ -1103,7 +1105,7 @@ color: lockMode
   </span>
 </p>
 
-<p>개선할 사항이 있으면 알려주세요.</p>
+<p>If you have any suggestions for improvement, please let us know.</p>
       <button
         onClick={() => setShowModal(false)}
         style={{
